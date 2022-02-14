@@ -260,7 +260,7 @@ export default {
               const label = new CSS2DObject(ul)
               labelRenderer = new CSS2DRenderer()
               labelRenderer.setSize(window.innerWidth, window.innerHeight)
-              labelRenderer.domElement.style.position = 'flex'
+              labelRenderer.domElement.style.position = 'absolute'
               // 相对鼠标的相对偏移
               labelRenderer.domElement.style.top = '0px'
               labelRenderer.domElement.style.left = '50'
@@ -430,7 +430,7 @@ h3 {
 .el-tag {
   position: fixed;
   min-width: 80px;
-  z-index: 999;
+  z-index: 1;
   font-size: 15px;
   text-align: center;
   line-height: 20px;
@@ -457,7 +457,7 @@ h3 {
   display: inline-block;
   position: fixed;
   display: none;
-  z-index: 999;
+  z-index: 1;
 }
 #menu li {
   height: 25px;
