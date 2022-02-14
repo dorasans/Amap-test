@@ -3,7 +3,13 @@
 <template>
   <div class="home_div">
     <div id="container" />
+    <div class="tag1" />
+    <ul id="tag">
+      <li>哪吒科技</li>
+      <li>中国上海</li>
+    </ul>
     <el-tag>{{ width }},{{ height }}</el-tag>
+
     <ul id="menu">
       <li>导航一</li>
       <li>alert</li>
@@ -46,10 +52,7 @@
       <el-menu-item index="3">消息中心</el-menu-item>
       <el-menu-item index="4">订单管理</el-menu-item>
     </el-menu>
-    <ul id="tag">
-      <li>哪吒科技</li>
-      <li>中国上海</li>
-    </ul>
+
   </div>
 </template>
 <script type="text/javascript">
@@ -257,13 +260,14 @@ export default {
               const label = new CSS2DObject(ul)
               labelRenderer = new CSS2DRenderer()
               labelRenderer.setSize(window.innerWidth, window.innerHeight)
-              labelRenderer.domElement.style.position = 'absolute'
+              labelRenderer.domElement.style.position = 'flex'
               // 相对鼠标的相对偏移
               labelRenderer.domElement.style.top = '0px'
-              labelRenderer.domElement.style.left = '50px'
+              labelRenderer.domElement.style.left = '50'
               // //设置.pointerEvents=none，以免模型标签HTML元素遮挡鼠标选择场景模型
               labelRenderer.domElement.style.pointerEvents = 'none'
-              document.body.appendChild(labelRenderer.domElement)
+              // labelRenderer.domElement.style.zIndex = '0'
+              document.querySelector('.tag1').appendChild(labelRenderer.domElement)
               scene.add(label)
               window.addEventListener('click', this.onMouseClick, false)
               window.addEventListener('resize', onWindowResize, false)
@@ -426,6 +430,7 @@ h3 {
 .el-tag {
   position: fixed;
   min-width: 80px;
+  z-index: 999;
   font-size: 15px;
   text-align: center;
   line-height: 20px;
@@ -452,6 +457,7 @@ h3 {
   display: inline-block;
   position: fixed;
   display: none;
+  z-index: 999;
 }
 #menu li {
   height: 25px;
