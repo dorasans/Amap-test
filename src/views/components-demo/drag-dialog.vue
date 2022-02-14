@@ -131,11 +131,20 @@ export default {
       })
         .then((AMap) => {
           var lnglat = new AMap.LngLat(121.37, 31.47)
+          var imageLayer = new AMap.ImageLayer({
+            url: 'https://amappc.cn-hangzhou.oss-pub.aliyun-inc.com/lbs/static/img/dongwuyuan.jpg',
+            bounds: new AMap.Bounds(
+              [121.369765, 31.485106],
+              [121.384765, 31.492366]
+            ),
+            zooms: [15, 21]
+          })
           this.map = new AMap.Map('container', {
             viewMode: '3D',
             zoom: 15, // 初始化地图级别
             center: lnglat,
-            resizeEnable: true
+            resizeEnable: true,
+            layers: [AMap.createDefaultLayer(), imageLayer]
           })
 
           var camera
