@@ -9,6 +9,14 @@
       <li>中国上海</li>
     </ul>
     <el-tag>{{ width }},{{ height }}</el-tag>
+    <!-- <div class="input-item">
+      <button id="show-obj3d-btn" class="btn" @click="showLayer()">显示图层</button>
+      <button id="hide-obj3d-btn" class="btn" @onclick="hideLayer()">隐藏图层</button>
+    </div> -->
+    <el-row>
+      <el-button type="primary" @click="showLayer()">显示图层</el-button>
+      <el-button type="primary" @click="hideLayer()">隐藏图层</el-button>
+    </el-row>
 
     <ul id="menu">
       <li>导航一</li>
@@ -82,7 +90,10 @@ export default {
       height: null,
       activeIndex2: '',
       cities: cityOptions,
-      polygonIs: false
+      polygonIs: false,
+      satellite: null,
+      satelliteIs: false,
+      imageLayer: []
     }
   },
   created() {},
@@ -135,6 +146,14 @@ export default {
         .then((AMap) => {
           var lnglat = new AMap.LngLat(121.37, 31.47)
           var imageLayer = new AMap.ImageLayer({
+            url: 'https://ae01.alicdn.com/kf/H12aa8b05e0f44c699163854961a0a5faX.png',
+            bounds: new AMap.Bounds(
+              [121.369765, 31.485106],
+              [121.384765, 31.492366]
+            ),
+            zooms: [15, 21]
+          })
+          var imageLayer2 = new AMap.ImageLayer({
             url: 'https://amappc.cn-hangzhou.oss-pub.aliyun-inc.com/lbs/static/img/dongwuyuan.jpg',
             bounds: new AMap.Bounds(
               [121.369765, 31.485106],
@@ -142,12 +161,18 @@ export default {
             ),
             zooms: [15, 21]
           })
+          var satellite = new AMap.TileLayer.Satellite()
+          this.satellite = satellite
+          this.imageLayer[0] = imageLayer
+          this.imageLayer[1] = imageLayer2
+          satellite.hide()
+          this.imageLayer[1].hide()
           this.map = new AMap.Map('container', {
             viewMode: '3D',
             zoom: 15, // 初始化地图级别
             center: lnglat,
             resizeEnable: true,
-            layers: [AMap.createDefaultLayer(), imageLayer]
+            layers: [AMap.createDefaultLayer(), this.satellite, this.imageLayer[0], this.imageLayer[1]]
           })
 
           var camera
@@ -269,7 +294,7 @@ export default {
               // labelRenderer.domElement.style.zIndex = '0'
               document.querySelector('.tag1').appendChild(labelRenderer.domElement)
               scene.add(label)
-              window.addEventListener('click', this.onMouseClick, false)
+              // window.addEventListener('click', this.onMouseClick, false)
               window.addEventListener('resize', onWindowResize, false)
               window.addEventListener('mousemove', this.onMouseMove, false)
               window.addEventListener('mouseup', this.onMouseUp, false)
@@ -364,6 +389,18 @@ export default {
         a.style.display = 'none'
       }
     },
+    showLayer() {
+      this.satellite.show()
+      this.satelliteIs = true
+      this.imageLayer[0].hide()
+      this.imageLayer[1].show()
+    },
+    hideLayer() {
+      this.satellite.hide()
+      this.satelliteIs = false
+      this.imageLayer[0].show()
+      this.imageLayer[1].hide()
+    },
     onMouseUp(e) {
       this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
       this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1
@@ -399,6 +436,7 @@ export default {
   }
 }
 </script>
+
 <style scoped>
 .home_div {
   padding: 0px;
