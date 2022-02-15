@@ -1,7 +1,7 @@
 * eslint-disable no-unused-vars */
 /* eslint-disable no-unused-vars */
 <template>
-  <div class="home_div">
+  <div>
     <div id="container" />
     <div class="tag1" />
     <ul id="tag">
@@ -33,33 +33,34 @@
       </li>
       <li>text</li>
     </ul>
-    <el-menu
-      :default-active="activeIndex2"
-      class="el-menu-demo"
-      mode="horizontal"
-      background-color="#fff"
-      text-color="#000"
-      active-text-color="#409eff"
-    >
-      <el-menu-item index="1">处理中心</el-menu-item>
-      <el-submenu index="2">
-        <template slot="title">我的工作台</template>
-        <el-checkbox
-          v-for="city in cities"
-          :key="city"
-          :label="city"
-          style="display: block; left: 20px"
-        >{{ city }}</el-checkbox>
-        <el-submenu index="2-4" class="four">
-          <template slot="title">选项4</template>
-          <el-menu-item index="2-4-1">选项1</el-menu-item>
-          <el-menu-item index="2-4-2">选项2</el-menu-item>
-          <el-menu-item index="2-4-3">选项3</el-menu-item>
+    <div id="elementmenu">
+      <el-menu
+        :default-active="activeIndex2"
+        mode="horizontal"
+        background-color="#fff"
+        text-color="#000"
+        active-text-color="#409eff"
+      >
+        <el-menu-item index="1">处理中心</el-menu-item>
+        <el-submenu index="2">
+          <template slot="title">我的工作台</template>
+          <el-checkbox
+            v-for="city in cities"
+            :key="city"
+            :label="city"
+            style="display: block; left: 20px"
+          >{{ city }}</el-checkbox>
+          <el-submenu index="2-4" class="four">
+            <template slot="title">选项4</template>
+            <el-menu-item index="2-4-1">选项1</el-menu-item>
+            <el-menu-item index="2-4-2">选项2</el-menu-item>
+            <el-menu-item index="2-4-3">选项3</el-menu-item>
+          </el-submenu>
         </el-submenu>
-      </el-submenu>
-      <el-menu-item index="3">消息中心</el-menu-item>
-      <el-menu-item index="4">订单管理</el-menu-item>
-    </el-menu>
+        <el-menu-item index="3">消息中心</el-menu-item>
+        <el-menu-item index="4">订单管理</el-menu-item>
+      </el-menu>
+    </div>
 
   </div>
 </template>
@@ -438,13 +439,13 @@ export default {
 </script>
 
 <style scoped>
-.home_div {
+/* .home_div {
   padding: 0px;
   margin: 0px;
   width: 100%;
   height: 100%;
   position: relative;
-}
+} */
 #container {
   padding: 0px;
   margin: 0px;
@@ -452,13 +453,13 @@ export default {
   height: 100%;
   position: absolute;
 }
-.map_title {
+/* .map_title {
   position: absolute;
   z-index: 1;
   width: 100%;
   height: 50px;
   background-color: rgba(27, 25, 27, 0.884);
-}
+} */
 h3 {
   position: absolute;
   left: 10px;
@@ -525,16 +526,20 @@ h3 {
   background-repeat: no-repeat;
   background-position: right 9px;
 }
-#container {
+/* #container {
   height: 630px;
-}
+} */
+/* #elementmenu {
+  overflow-x: hidden;
+} */
 .el-menu {
+  display: flex;
+  position: absolute;
   top: 20px;
-  margin-left: 50%;
-  max-width: 478px;
+  left: 50%;
   height: 40px;
 }
-.el-menu--horizontal > .el-submenu /deep/ .el-submenu__title {
+ .el-menu--horizontal > .el-submenu /deep/ .el-submenu__title {
   height: 40px;
   line-height: 40px;
   padding: 0 20px;
