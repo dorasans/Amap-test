@@ -18,12 +18,12 @@
       <el-button type="primary" @click="hideLayer()">隐藏图层</el-button>
     </el-row>
 
-    <ul id="menu">
-      <li>导航一</li>
-      <li>alert</li>
-      <li class="has-sub">
+    <ul v-show="menuShipShow" ref="menuShip" class="ul_menu">
+      <li @click="daohang">导航一</li>
+      <li @click="alert">alert</li>
+      <li class="has-sub" @click="confirm">
         confirm
-        <ul>
+        <ul v-show="menuShow">
           <li>网页特效原理分析</li>
           <li>响应用户操作</li>
           <li>提示框效果</li>
@@ -31,7 +31,7 @@
           <li>元素属性操作</li>
         </ul>
       </li>
-      <li>text</li>
+      <li @click="text">text</li>
     </ul>
     <div id="elementmenu">
       <el-menu
@@ -94,7 +94,9 @@ export default {
       polygonIs: false,
       satellite: null,
       satelliteIs: false,
-      imageLayer: []
+      imageLayer: [],
+      menuShipShow: false,
+      menuShow: false
     }
   },
   created() {},
@@ -103,29 +105,27 @@ export default {
   },
   mounted() {
     this.initAMap()
-    var ul = document.querySelector('#menu')
     // 禁用鼠标右键菜单事件【contextmenu】
     document.oncontextmenu = function() {
       return false
     }
     // ul事件委托
-    ul.onclick = function(e) {
-      if (e.target.innerHTML === 'alert') {
-        alert('alert')
-      } else if (e.target.innerHTML === 'confirm') {
-        if (confirm('confirm')) {
-          window.close()
-        }
-      } else if (e.target.innerHTML === 'text') {
-        var res = document.getSelection().toString()
-        window.open('https://www.baidu.com/s?wd=' + res)
-      } else {
-        var result = prompt('请输入要搜索的内容：')
-        window.open('https://www.baidu.com/s?wd=' + result)
-      }
-    }
   },
   methods: {
+    daohang() {
+      var result = prompt('请输入要搜索的内容：')
+      window.open('https://www.baidu.com/s?wd=' + result)
+    },
+    alert() {
+      alert('alert')
+    },
+    text() {
+      var res = document.getSelection().toString()
+      window.open('https://www.baidu.com/s?wd=' + res)
+    },
+    confirm() {
+      alert('confirm')
+    },
     initAMap() {
       AMapLoader.load({
         key: '4f84ac154dfef9a263a21c81e3194788', // 设置您的key
@@ -424,10 +424,10 @@ export default {
           element.className
         )
       }
-      const ul = document.querySelector('#menu')
+      const ul = this.$refs.menuShip
       if (e.button === 2 && (intersects[0] || this.polygonIs)) {
-        ul.style.display = 'block'
         //     // 设置菜单位置
+        this.menuShipShow = true
         ul.style.left = e.clientX + 5 + 'px'
         ul.style.top = e.clientY + 5 + 'px'
         ul.onmouseover = function(event) {
@@ -439,7 +439,7 @@ export default {
           }
         }
       } else {
-        ul.style.display = 'none'
+        this.menuShipShow = false
       }
     }
   }
@@ -497,18 +497,16 @@ h3 {
   margin: 0;
 }
 
-#menu,
-#menu ul {
+.ul_menu,
+.ul_menu ul {
   min-width: 150px;
   list-style: none;
   background: #ffffff;
   border: 1px solid #dcdfe6;
-  display: inline-block;
   position: fixed;
-  display: none;
   z-index: 1;
 }
-#menu li {
+.ul_menu li {
   height: 25px;
   padding: 0 10px;
   border-bottom: 1px solid #e4e7ed;
@@ -521,17 +519,17 @@ h3 {
   white-space: nowrap;
   color: #000;
 }
-#menu li:last-of-type {
+.ul_menu li:last-of-type {
   border-bottom: 0 none;
 }
-#menu li:hover {
+.ul_menu li:hover {
   background: #409eff;
   color: #fff;
 }
-#menu li.has-sub:hover > ul {
-  display: block;
+.ul_menu li.has-sub:hover > ul {
+  display: block !important
 }
-#menu li.has-sub {
+.ul_menu li.has-sub {
   background-image: url(https://pandoraui.github.io/learning-javascript/lesson6/img/arrow.png);
   background-repeat: no-repeat;
   background-position: right 9px;
