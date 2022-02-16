@@ -271,13 +271,18 @@ export default {
                 strokeOpacity: 0.2, // 线透明度
                 strokeWeight: 3, // 线宽
                 fillColor: '#1791fc', // 填充色
-                fillOpacity: 0.35 // 填充透明度
+                fillOpacity: 0.35, // 填充透明度
+                zIndex: -1
               })
-              polygon.on('mouseover', () => {
-                this.polygonIs = true
-              })
-              polygon.on('mouseout', () => {
-                this.polygonIs = false
+              var that = this
+              polygon.on('mouseover', function(e) {
+                e = e || window.event
+                e.stopPropagation ? e.stopPropagation() : e.cancelBubble = true
+                that.polygonIs = true
+              }).on('mouseout', function(e) {
+                e = e || window.event
+                e.stopPropagation ? e.stopPropagation() : e.cancelBubble = true
+                that.polygonIs = false
               })
               this.map.add([polyline1, polygon])
               this.raycaster = new THREE.Raycaster()
@@ -354,7 +359,6 @@ export default {
     },
     onMouseClick(event) {
       // 通过鼠标点击的位置计算出raycaster所需要的点的位置，以屏幕中心为原点，值的范围为-1到1.
-
       this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1
       this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
 
@@ -369,12 +373,14 @@ export default {
       alert(intersects[0].object.testName)
     },
     onMouseMove(e) {
-      this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
-      this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1
+      e.preventDefault()
 
       // 通过鼠标点的位置和当前相机的矩阵计算出raycaster
       this.raycaster.setFromCamera(this.mouse, this.mycamera)
-
+      const container = document.querySelector('#container')
+      const getBoundingClientRect = container.getBoundingClientRect()
+      this.mouse.x = ((e.clientX - getBoundingClientRect.left) / container.offsetWidth) * 2 - 1
+      this.mouse.y = -((e.clientY - getBoundingClientRect.top) / container.offsetHeight) * 2 + 1
       // 获取raycaster直线和所有模型相交的数组集合
       var intersects = this.raycaster.intersectObjects(this.myscene.children)
       const a = document.querySelector('.el-tag')
@@ -403,9 +409,11 @@ export default {
       this.imageLayer[1].hide()
     },
     onMouseUp(e) {
-      this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
-      this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1
-
+      e.preventDefault()
+      const container = document.querySelector('#container')
+      const getBoundingClientRect = container.getBoundingClientRect()
+      this.mouse.x = ((e.clientX - getBoundingClientRect.left) / container.offsetWidth) * 2 - 1
+      this.mouse.y = -((e.clientY - getBoundingClientRect.top) / container.offsetHeight) * 2 + 1
       // 通过鼠标点的位置和当前相机的矩阵计算出raycaster
       this.raycaster.setFromCamera(this.mouse, this.mycamera)
 
@@ -420,8 +428,8 @@ export default {
       if (e.button === 2 && (intersects[0] || this.polygonIs)) {
         ul.style.display = 'block'
         //     // 设置菜单位置
-        ul.style.left = e.clientX + 'px'
-        ul.style.top = e.clientY + 'px'
+        ul.style.left = e.clientX + 5 + 'px'
+        ul.style.top = e.clientY + 5 + 'px'
         ul.onmouseover = function(event) {
           var target = event.target
           if (hasClass(target, 'has-sub')) {
@@ -468,6 +476,8 @@ h3 {
 }
 .el-tag {
   position: fixed;
+  display: none;
+  pointer-events: none;
   min-width: 80px;
   z-index: 1;
   font-size: 15px;
