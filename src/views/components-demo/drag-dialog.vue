@@ -37,9 +37,8 @@
       <el-menu
         :default-active="activeIndex2"
         mode="horizontal"
-        background-color="#fff"
         text-color="#000"
-        active-text-color="#409eff"
+        background-color="#fff"
       >
         <el-menu-item index="1" @click="refresh_btn()">刷新</el-menu-item>
         <el-submenu index="2">
@@ -274,13 +273,9 @@ export default {
                 zIndex: -1
               })
               var that = this
-              polygon.on('mouseover', function(e) {
-                e = e || window.event
-                e.stopPropagation ? e.stopPropagation() : e.cancelBubble = true
+              polygon.on('mouseover', function() {
                 that.polygonIs = true
-              }).on('mouseout', function(e) {
-                e = e || window.event
-                e.stopPropagation ? e.stopPropagation() : e.cancelBubble = true
+              }).on('mouseout', function() {
                 that.polygonIs = false
               })
               this.map.add([polyline1, polygon])
