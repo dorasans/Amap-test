@@ -16,8 +16,8 @@
     <el-row>
       <el-button type="primary" @click="showLayer()">显示图层</el-button>
       <el-button type="primary" @click="hideLayer()">隐藏图层</el-button>
+      <el-button type="success" icon="el-icon-refresh" plain class="re" @click="refresh_btn()">刷新</el-button>
     </el-row>
-
     <ul v-show="menuShipShow" ref="menuShip" class="ul_menu">
       <li @click="daohang">导航一</li>
       <li @click="alert">alert</li>
@@ -41,7 +41,7 @@
         text-color="#000"
         active-text-color="#409eff"
       >
-        <el-menu-item index="1">处理中心</el-menu-item>
+        <el-menu-item index="1" @click="refresh_btn()">刷新</el-menu-item>
         <el-submenu index="2">
           <template slot="title">我的工作台</template>
           <el-checkbox
@@ -77,6 +77,7 @@ import {
 const cityOptions = ['选项一', '选项二', '选项三', '选项四']
 export default {
   name: 'Mapview',
+  inject: ['reload'],
   data() {
     return {
       map: null,
@@ -93,7 +94,6 @@ export default {
       cities: cityOptions,
       polygonIs: false,
       satellite: null,
-      satelliteIs: false,
       imageLayer: [],
       menuShipShow: false,
       menuShow: false
@@ -155,7 +155,7 @@ export default {
             zooms: [15, 21]
           })
           var imageLayer2 = new AMap.ImageLayer({
-            url: 'https://amappc.cn-hangzhou.oss-pub.aliyun-inc.com/lbs/static/img/dongwuyuan.jpg',
+            url: 'https://ae05.alicdn.com/kf/Hcbce4fbf3b05449a868072862e65b243x.png',
             bounds: new AMap.Bounds(
               [121.369765, 31.485106],
               [121.384765, 31.492366]
@@ -166,14 +166,12 @@ export default {
           this.satellite = satellite
           this.imageLayer[0] = imageLayer
           this.imageLayer[1] = imageLayer2
-          satellite.hide()
-          this.imageLayer[1].hide()
           this.map = new AMap.Map('container', {
             viewMode: '3D',
             zoom: 15, // 初始化地图级别
             center: lnglat,
             resizeEnable: true,
-            layers: [AMap.createDefaultLayer(), this.satellite, this.imageLayer[0], this.imageLayer[1]]
+            layers: [AMap.createDefaultLayer(), this.imageLayer[0]]
           })
 
           var camera
@@ -238,6 +236,7 @@ export default {
               var geo = new THREE.BoxBufferGeometry(1000, 1000, 1000)
               for (let i = 0; i < data.length; i++) {
                 const d = data[i]
+                // 立方体对应的mesh
                 var mesh = new THREE.Mesh(geo, mat)
 
                 mesh.position.set(d[0], d[1], 500)
@@ -299,7 +298,8 @@ export default {
               labelRenderer.domElement.style.pointerEvents = 'none'
               // labelRenderer.domElement.style.zIndex = '0'
               document.querySelector('.tag1').appendChild(labelRenderer.domElement)
-              scene.add(label)
+              // 在立方体中添加标签
+              mesh.add(label)
               // window.addEventListener('click', this.onMouseClick, false)
               window.addEventListener('resize', onWindowResize, false)
               window.addEventListener('mousemove', this.onMouseMove, false)
@@ -397,16 +397,14 @@ export default {
       }
     },
     showLayer() {
-      this.satellite.show()
-      this.satelliteIs = true
-      this.imageLayer[0].hide()
-      this.imageLayer[1].show()
+      this.map.add(this.satellite)
+      this.map.add(this.imageLayer[1])
+      this.map.remove(this.imageLayer[0])
     },
     hideLayer() {
-      this.satellite.hide()
-      this.satelliteIs = false
-      this.imageLayer[0].show()
-      this.imageLayer[1].hide()
+      this.map.remove(this.satellite)
+      this.map.remove(this.imageLayer[1])
+      this.map.add(this.imageLayer[0])
     },
     onMouseUp(e) {
       e.preventDefault()
@@ -441,6 +439,10 @@ export default {
       } else {
         this.menuShipShow = false
       }
+    },
+    refresh_btn() {
+      this.reload()
+      console.log('刷新了')
     }
   }
 }
