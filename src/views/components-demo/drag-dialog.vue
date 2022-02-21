@@ -4,10 +4,10 @@
   <div>
     <div id="container" />
     <div class="tag1" />
-    <ul id="tag">
+    <!-- <ul id="tag">
       <li>哪吒科技</li>
       <li>中国上海</li>
-    </ul>
+    </ul> -->
     <el-tag>{{ width }},{{ height }}</el-tag>
     <!-- <div class="input-item">
       <button id="show-obj3d-btn" class="btn" @click="showLayer()">显示图层</button>
@@ -182,8 +182,7 @@ export default {
           var customCoords = this.map.customCoords
           // 数据使用转换工具进行转换，这个操作必须要提前执行（在获取镜头参数 函数之前执行），否则将会获得一个错误信息。
           // var data = customCoords.lngLatsToCoords([[121.368578, 31.469916]]);
-          var data = customCoords.lngLatsToCoords([[121.37, 31.47]])
-
+          var data = customCoords.lngLatsToCoords([[121.37, 31.47], [121.33, 31.47]])
           // 创建 GL 图层
           var gllayer = new AMap.GLCustomLayer({
             // 图层的层级
@@ -198,6 +197,24 @@ export default {
                 100,
                 1 << 30
               )
+              // var text = new AMap.Text({
+              //   text: '纯文本标记',
+              //   anchor: 'center', // 设置文本标记锚点
+              //   draggable: true,
+              //   cursor: 'pointer',
+              //   angle: 10,
+              //   style: {
+              //     'padding': '4px 10px',
+              //     'border-radius': '5px',
+              //     'border-width': 0,
+              //     'text-align': 'center',
+              //     'font-size': '16px',
+              //     'text-shadow': '0 1px white, 1px 0 white, -1px 0 white, 0 -1px white',
+              //     'color': '#808080'
+              //   },
+              //   position: [121.37, 31.47]
+              // })
+              // text.setMap(this.map)
               this.mycamera = camera
               function onWindowResize() {
                 camera.aspect = window.innerWidth / window.innerHeight
@@ -211,6 +228,9 @@ export default {
 
               // 自动清空画布这里必须设置为 false，否则地图底图将无法显示
               renderer.autoClear = false
+              renderer.setPixelRatio(window.devicePixelRatio)
+              renderer.setSize(window.innerWidth, window.innerHeight)
+              document.querySelector('.tag1').appendChild(renderer.domElement)
               scene = new THREE.Scene()
               this.myscene = scene
               // 环境光照和平行光
@@ -247,6 +267,11 @@ export default {
                 this.mymeshes.push(mesh)
                 scene.add(mesh)
               }
+              // var mesh = new THREE.Mesh(geo, mat)
+              // mesh.position.set(data[0], data[1], 500)
+              // meshes.push(mesh)
+              // this.mymeshes.push(mesh)
+              // scene.add(mesh)
               var path1 = [
                 [121.32, 31.45],
                 [121.36, 31.45]
@@ -281,20 +306,31 @@ export default {
               this.map.add([polyline1, polygon])
               this.raycaster = new THREE.Raycaster()
               this.mouse = new THREE.Vector2(1, 1)
-              const ul = document.getElementById('tag')
-              const label = new CSS2DObject(ul)
+              // const ul = document.getElementById('tag')
               labelRenderer = new CSS2DRenderer()
               labelRenderer.setSize(window.innerWidth, window.innerHeight)
               labelRenderer.domElement.style.position = 'absolute'
               // 相对鼠标的相对偏移
               labelRenderer.domElement.style.top = '0px'
-              labelRenderer.domElement.style.left = '50'
+              // labelRenderer.domElement.style.left = '0px'
               // //设置.pointerEvents=none，以免模型标签HTML元素遮挡鼠标选择场景模型
               labelRenderer.domElement.style.pointerEvents = 'none'
+              // labelRenderer.domElement.style.top = '-16px'
+              // labelRenderer.domElement.style.left = '0px'
               // labelRenderer.domElement.style.zIndex = '0'
               document.querySelector('.tag1').appendChild(labelRenderer.domElement)
+              const label = this.createTag(['哪吒', '中国上海'])
+              var worldVector = new THREE.Vector3()
+              // 获取网格模型boxMesh的世界坐标，赋值给worldVector
+              this.mymeshes[0].getWorldPosition(worldVector)
+              // 世界坐标转标准设备坐标，standardVector是WebGL设备坐标
+              // var standardVector = worldVector.project(camera)
               // 在立方体中添加标签
-              mesh.add(label)
+              this.mymeshes[0].add(label)
+              const label2 = this.createTag(['中国', '你好'])
+              this.mymeshes[1].add(label2)
+              // label.position.set(1000, 1000, 1000)
+              // label2.position.set(1000, 1000, 1000)
               // window.addEventListener('click', this.onMouseClick, false)
               window.addEventListener('resize', onWindowResize, false)
               window.addEventListener('mousemove', this.onMouseMove, false)
@@ -336,6 +372,24 @@ export default {
         .catch((e) => {
           console.log(e)
         })
+    },
+    createTag(str) {
+      const ul = document.createElement('ul')
+      ul.style.padding = '4px 10px'
+      ul.style.color = '#808080'
+      ul.style.textShadow = '0 1px white, 1px 0 white, -1px 0 white, 0 -1px white'
+      ul.style.fontSize = '16px'
+      ul.style.position = 'absolute'
+      ul.style.borderRadius = '5px'
+      ul.style.pointerEvents = 'none'
+      ul.style.listStyle = 'none'
+      for (let i = 0; i < str.length; i++) {
+        const li = document.createElement('li')
+        li.innerHTML = str[i]
+        ul.appendChild(li)
+      }
+      const label = new CSS2DObject(ul)
+      return label
     },
     initPixi() {
       this.pixiApp = new PIXI.Application({
@@ -393,8 +447,8 @@ export default {
     },
     showLayer() {
       this.map.add(this.satellite)
-      this.map.add(this.imageLayer[1])
       this.map.remove(this.imageLayer[0])
+      this.map.add(this.imageLayer[1])
     },
     hideLayer() {
       this.map.remove(this.satellite)
@@ -476,7 +530,7 @@ h3 {
   display: none;
   pointer-events: none;
   min-width: 80px;
-  z-index: 1;
+  z-index: 999;
   font-size: 15px;
   text-align: center;
   line-height: 20px;
@@ -501,7 +555,7 @@ h3 {
   background: #ffffff;
   border: 1px solid #dcdfe6;
   position: fixed;
-  z-index: 1;
+  z-index: 999;
 }
 .ul_menu li {
   height: 25px;
@@ -558,7 +612,7 @@ h3 {
 .el-menu .el-submenu /deep/ .el-submenu__title {
   padding: 0 20px;
 }
-ul#tag {
+.tag {
   padding: 4px 10px;
   color: #808080;
   text-shadow: 0 1px white, 1px 0 white, -1px 0 white, 0 -1px white;
@@ -567,6 +621,7 @@ ul#tag {
   border-radius: 5px;
   pointer-events: none;
   list-style: none;
+  text-align: center;
 }
 </style>
 
